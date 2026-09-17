@@ -2,6 +2,9 @@ type PaginationProps = {
   page: number
   totalPages: number
   onPageChange: (page: number) => void
+  limit: number
+  limitOptions: number[]
+  onLimitChange: (limit: number) => void
 }
 
 function getVisiblePages(page: number, totalPages: number): Array<number | '…'> {
@@ -30,54 +33,79 @@ function getVisiblePages(page: number, totalPages: number): Array<number | '…'
   return items
 }
 
-
-/** Простая пагинация: назад / вперёд и номера страниц вокруг текущей */
-function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
-  if (totalPages <= 1) {
-    return null
-  }
-
+function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+  limit,
+  limitOptions,
+  onLimitChange,
+}: PaginationProps) {
   const pages = getVisiblePages(page, totalPages)
 
   return (
-    <nav className="pagination" aria-label="Страницы постов">
-      <button
-        type="button"
-        disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
-      >
-        Назад
-      </button>
+    <div className="pagination">
+      <label className="pagination__limit">
+        <span className="pagination__limit-text">Постов на странице</span>
+        <select
+          className="pagination__select"
+          value={limit}
+          onChange={(event) => {
+            onLimitChange(Number(event.target.value))
+          }}
+        >
+          {limitOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
 
-      {pages.map((item, index) =>
-        item === '…' ? (
-          <span key={`dots-${index}`} className="pagination-dots">
-            …
-          </span>
-        ) : (
+      {totalPages > 1 && (
+        <div className="pagination__pages">
           <button
-            key={item}
+            className="pagination__button"
             type="button"
-            className={item === page ? 'is-active' : undefined}
-            onClick={() => onPageChange(item)}
-            aria-current={item === page ? 'page' : undefined}
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
           >
-            {item}
+            Назад
           </button>
-        ),
-      )}
 
-      <button
-        type="button"
-        disabled={page >= totalPages}
-        onClick={() => onPageChange(page + 1)}
-      >
-        Вперёд
-      </button>
-    </nav>
+          {pages.map((item, index) =>
+            item === '…' ? (
+              <span key={`dots-${index}`} className="pagination__dots">
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                className={
+                  item === page
+                    ? 'pagination__button pagination__button_active'
+                    : 'pagination__button'
+                }
+                onClick={() => onPageChange(item)}
+              >
+                {item}
+              </button>
+            ),
+          )}
+
+          <button
+            className="pagination__button"
+            type="button"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            Вперёд
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
-
-
 
 export default Pagination

@@ -6,12 +6,13 @@ import './App.css'
 function App() {
   return (
     <div className="layout">
-      <nav className="nav">
-        <Link to="/">Посты</Link>
+      <nav className="layout__nav">
+        <Link className="layout__nav-link" to="/">
+          Посты
+        </Link>
       </nav>
 
-      <main>
-        {/* / — список с пагинацией, /posts/:id — детальная страница */}
+      <main className="layout__main">
         <Routes>
           <Route path="/" element={<PostsPage />} />
           <Route path="/posts/:id" element={<PostPage />} />

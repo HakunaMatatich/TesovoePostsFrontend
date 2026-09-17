@@ -35,19 +35,21 @@ function PostPage() {
   }, [id])
 
   return (
-    <article className="post-page">
-      <Link to="/" className="back-link">
+    <article className="post">
+      <Link to="/" className="post__back">
         ← К списку
       </Link>
 
-      {loading && <p className="status">Загрузка…</p>}
-      {error && <p className="status error">{error}</p>}
+      {loading && <p className="post__status">Загрузка…</p>}
+      {error && <p className="post__status post__status_error">{error}</p>}
 
       {post && (
         <>
-          <p className="muted">Пост #{post.id} · пользователь {post.userId}</p>
-          <h1>{post.title}</h1>
-          <p className="post-body">{post.body}</p>
+          <p className="post__meta">
+            Пост #{post.id} · пользователь {post.userId}
+          </p>
+          <h1 className="post__title">{post.title}</h1>
+          <p className="post__body">{post.body}</p>
         </>
       )}
     </article>

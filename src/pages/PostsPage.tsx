@@ -10,7 +10,6 @@ const DEFAULT_LIMIT = 10
 function PostsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Лимит и страница живут в URL (?page=2&limit=10), чтобы можно было обновить/поделиться ссылкой
   const page = Math.max(1, Number(searchParams.get('page')) || 1)
   const limitFromUrl = Number(searchParams.get('limit')) || DEFAULT_LIMIT
   const limit = LIMIT_OPTIONS.includes(limitFromUrl) ? limitFromUrl : DEFAULT_LIMIT
@@ -54,52 +53,39 @@ function PostsPage() {
   }
 
   return (
-    <section className="posts-page">
-      <header className="posts-header">
-        <h1>Список постов</h1>
-        <label className="limit-field">
-          Постов на странице
-          <select
-            value={limit}
-            onChange={(event) => {
-              // Смена лимита сбрасывает на первую страницу
-              updateParams({ page: 1, limit: Number(event.target.value) })
-            }}
-          >
-            {LIMIT_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+    <section className="posts">
+      <header className="posts__header">
+        <h1 className="posts__title">Список постов</h1>
       </header>
 
-      {loading && <p className="status">Загрузка…</p>}
-      {error && <p className="status error">{error}</p>}
+      {loading && <p className="posts__status">Загрузка…</p>}
+      {error && <p className="posts__status posts__status_error">{error}</p>}
 
       {!loading && !error && (
         <>
-          <ul className="post-list">
+          <ul className="posts__list">
             {posts.map((post) => (
-              <li key={post.id}>
+              <li key={post.id} className="posts__item">
                 <Link to={`/posts/${post.id}`} className="post-card">
-                  <span className="post-id">#{post.id}</span>
-                  <h2>{post.title}</h2>
-                  <p>{post.body}</p>
+                  <span className="post-card__id">#{post.id}</span>
+                  <h2 className="post-card__title">{post.title}</h2>
+                  <p className="post-card__text">{post.body}</p>
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div className="posts-footer">
-            <p className="muted">
+          <div className="posts__footer">
+            <p className="posts__meta">
               Страница {page} из {totalPages} · всего {total}
             </p>
             <Pagination
               page={page}
               totalPages={totalPages}
               onPageChange={(nextPage) => updateParams({ page: nextPage })}
+              limit={limit}
+              limitOptions={LIMIT_OPTIONS}
+              onLimitChange={(nextLimit) => updateParams({ page: 1, limit: nextLimit })}
             />
           </div>
         </>

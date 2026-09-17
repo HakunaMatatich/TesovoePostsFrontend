@@ -1,4 +1,4 @@
-import type { Post, PostsPageResult } from '../types/post'
+import { isPost, isPostList, type Post, type PostsPageResult } from '../types/post'
 
 const API_URL = 'https://jsonplaceholder.typicode.com/posts'
 
@@ -22,11 +22,16 @@ export async function fetchPosts(
     throw new Error(`Не удалось загрузить посты (${response.status})`)
   }
 
-  const posts = (await response.json()) as Post[]
-  const totalHeader = response.headers.get('X-Total-Count')
-  const total = totalHeader ? Number(totalHeader) : posts.length
+  const data: unknown = await response.json()
 
-  return { posts, total }
+  if (!isPostList(data)) {
+    throw new Error('Некорректный формат списка постов')
+  }
+
+  const totalHeader = response.headers.get('X-Total-Count')
+  const total = totalHeader ? Number(totalHeader) : data.length
+
+  return { posts: data, total }
 }
 
 /** Один пост по id, например /posts/5 */
@@ -41,5 +46,11 @@ export async function fetchPostById(id: string): Promise<Post> {
     throw new Error(`Не удалось загрузить пост (${response.status})`)
   }
 
-  return (await response.json()) as Post
+  const data: unknown = await response.json()
+
+  if (!isPost(data)) {
+    throw new Error('Некорректный формат поста')
+  }
+
+  return data
 }
